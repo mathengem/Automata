@@ -1,1 +1,26 @@
-
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SQLi Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>SQL Injection Scanner</h1>
+        <form action="/scan" method="POST">
+            <input type="url" name="url" placeholder="Target URL" required>
+            <input type="text" name="parameter" placeholder="Parameter to test" required>
+            <button type="submit">Start Scan</button>
+        </form>
+        
+        <div class="notice">
+            <p>Check existing reports:</p>
+            <ul>
+                {% for report in reports %}
+                <li><a href="/reports/{{ report }}">{{ report }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
