@@ -11,6 +11,12 @@
             <input type="url" name="url" placeholder="Target URL" required>
             <input type="text" name="parameter" placeholder="Parameter to test" required>
             <button type="submit">Start Scan</button>
+            
+            <!-- Add this to the form -->
+            <div class="loading-indicator" style="display: none;">
+                <div class="spinner"></div>
+                <p>Scanning in progress...</p>
+            </div>
         </form>
         
         <div class="notice">
@@ -20,6 +26,11 @@
                 <li><a href="/reports/{{ report }}">{{ report }}</a></li>
                 {% endfor %}
             </ul>
+        </div>
+        
+        <!-- Add this inside the <body> -->
+        <div class="scan-results">
+            <!-- Status updates will appear here -->
         </div>
     </div>
 </body>
