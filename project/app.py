@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, send_file, jsonify
 import os
 import threading
 import time
+from datetime import datetime
 from sqlmap_runner import run_sqlmap_scan
 
 app = Flask(__name__)
@@ -28,14 +29,36 @@ def start_scan():
 
     def scan_wrapper():
         try:
+            # Initializing
+            scan_status[scan_id].update({
+                "progress": 5,
+                "status_text": "Initializing SQLMap engine"
+            })
+            
+            # Simulated progress updates (replace with actual SQLMap progress)
+            for progress in range(10, 101, 5):
+                time.sleep(0.5)
+                scan_status[scan_id].update({
+                    "progress": progress,
+                    "status_text": f"Scanning parameter '{param}' ({progress}%)"
+                })
+
             report_path = run_sqlmap_scan(url, param, app.config['UPLOAD_FOLDER'])
-            scan_status[scan_id] = {
+            # Final completion
+            scan_status[scan_id].update({
                 "status": "completed",
+                "progress": 100,
                 "report": os.path.basename(report_path),
-                "poc": generate_poc(url, param)
-            }
+                "poc": f"curl -X GET '{url}?{param}=1%27%20OR%201=1--'",
+                "timestamp": datetime.now().isoformat()
+            })
+            
         except Exception as e:
-            scan_status[scan_id] = {"status": "failed", "error": str(e)}
+            scan_status[scan_id].update({
+                "status": "failed",
+                "error": str(e),
+                "progress": 100
+            })
 
     thread = threading.Thread(target=scan_wrapper)
     thread.start()
