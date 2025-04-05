@@ -1,31 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SQLi Scanner</title>
+    <title>SQL Injection Scanner</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>SQL Injection Scanner</h1>
-        <form id="scanForm">
-            <input type="url" name="url" placeholder="Target URL" required>
-            <input type="text" name="parameter" placeholder="Parameter to test" required>
-            <button type="submit">Start Scan</button>
-        </form>
-        
-        <div id="scanResults">
-            <!-- Status updates will appear here -->
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> SQL Injection Scanner</h1>
+            <p class="subtitle">Automated Security Testing Tool</p>
         </div>
-        
-        <div class="reports">
-            <h3>Existing Reports:</h3>
-            <ul id="reportList">
-                {% for report in reports %}
-                <li><a href="/reports/{{ report }}">{{ report }}</a></li>
-                {% endfor %}
-            </ul>
+
+        <div class="scan-container">
+            <form id="scanForm">
+                <div class="input-group">
+                    <label for="url"><i class="fas fa-link"></i> Target URL</label>
+                    <input type="url" name="url" placeholder="https://example.com/vulnerable.php" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="parameter"><i class="fas fa-tag"></i> Parameter to Test</label>
+                    <input type="text" name="parameter" placeholder="e.g. 'id' or 'user'" required>
+                </div>
+
+                <button type="submit" class="scan-button">
+                    <i class="fas fa-play"></i> Start Security Scan
+                </button>
+            </form>
+
+            <div id="scanResults" class="results-container"></div>
+        </div>
+
+        <div class="reports-section">
+            <h2><i class="fas fa-file-pdf"></i> Previous Scan Reports</h2>
+            <div id="reportList" class="report-items"></div>
         </div>
     </div>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
