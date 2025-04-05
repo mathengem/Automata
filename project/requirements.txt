@@ -1,1 +1,13 @@
+# requirements.txt
 
+# Core dependencies
+Flask==3.0.2
+python-dateutil==2.9.0.post0
+reportlab==4.1.0
+
+# PDF generation (requires wkhtmltopdf binary)
+pdfkit==1.0.0
+
+# SQLMap installation note: 
+# SQLMap is not available via pip - install manually using:
+# git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git
