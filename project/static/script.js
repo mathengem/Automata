@@ -1,4 +1,4 @@
-document.querySelector('form').addEventListener('submit', async (e) => {
+document.getElementById('scanForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const formData = new FormData(e.target);
@@ -7,21 +7,25 @@ document.querySelector('form').addEventListener('submit', async (e) => {
         body: formData
     });
     
-    const { scan_id } = await response.json();
+    const data = await response.json();
+    const scanId = data.scan_id;
+    
+    // Create status container
     const statusDiv = document.createElement('div');
-    statusDiv.id = `status-${scan_id}`;
+    statusDiv.className = 'scan-status';
     statusDiv.innerHTML = `
-        <div class="scan-status">
-            <div class="progress-bar"></div>
-            <div class="status-text">Initializing scan...</div>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 0%"></div>
         </div>
+        <div class="status-text">Initializing scan...</div>
     `;
-    document.querySelector('.notice').prepend(statusDiv);
+    
+    document.getElementById('scanResults').prepend(statusDiv);
     
     // Poll for updates
     const interval = setInterval(async () => {
-        const res = await fetch(`/scan/status/${scan_id}`);
-        const status = await res.json();
+        const statusResponse = await fetch(`/scan/status/${scanId}`);
+        const status = await statusResponse.json();
         
         const progressBar = statusDiv.querySelector('.progress-bar');
         const statusText = statusDiv.querySelector('.status-text');
@@ -29,38 +33,43 @@ document.querySelector('form').addEventListener('submit', async (e) => {
         switch(status.status) {
             case 'running':
                 progressBar.style.width = `${status.progress}%`;
-                statusText.textContent = `Scanning... ${status.progress}%`;
+                statusText.textContent = `Scanning ${status.url}?${status.parameter}=... (${status.progress}%)`;
                 break;
+                
             case 'completed':
                 clearInterval(interval);
                 statusDiv.innerHTML = `
                     <div class="scan-result success">
-                        Scan completed! 
-                        <a href="/reports/${status.report}">Download Report</a>
-                        <div class="poc">${status.poc}</div>
+                        <h4>Scan Completed!</h4>
+                        <p>Vulnerability Found: SQL Injection</p>
+                        <a href="/reports/${status.report}" class="download-btn">Download Report</a>
+                        <div class="poc">
+                            <strong>Proof of Concept:</strong>
+                            <code>${status.poc}</code>
+                        </div>
                     </div>
                 `;
                 refreshReports();
                 break;
+                
             case 'failed':
                 clearInterval(interval);
                 statusDiv.innerHTML = `
                     <div class="scan-result error">
-                        Scan failed: ${status.error}
+                        <h4>Scan Failed!</h4>
+                        <p>${status.error}</p>
                     </div>
                 `;
                 break;
         }
-    }, 2000);
+    }, 2000); // Poll every 2 seconds
 });
 
-function refreshReports() {
-    fetch('/reports')
-        .then(res => res.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            document.querySelector('ul').innerHTML = 
-                doc.querySelector('ul').innerHTML;
-        });
+async function refreshReports() {
+    const response = await fetch('/');
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    document.getElementById('reportList').innerHTML = 
+        doc.getElementById('reportList').innerHTML;
 }
